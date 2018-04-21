@@ -6,7 +6,7 @@ class Motor():
     def __init__(self, pinNumber = 21, pinMode = GPIO.BCM):
         self.pinNumber = pinNumber
         self.pinMode = pinMode
-        GPIO.setmode(self.pinMode())
+        GPIO.setmode(self.pinMode)
         GPIO.setwarnings(False)
         GPIO.setup(self.pinNumber, GPIO.OUT)
 

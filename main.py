@@ -12,15 +12,15 @@ try:
     motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE)
     ds3231 = SDL_DS3231.SDL_DS3231() # start rtc object with default values
     ds3231.write_now()
-    print 
+    
     #Main loop
     while True:
-        print ("DS3231=\t\t%s") % ds3231.read_datetime()
+        print ( ("DS3231=\t\t%s") % ds3231.read_datetime())
         motor.turnOn()
-        print( datetime.now() + " | Motor On" )  # DEBUG
+        print( str(datetime.now()) + " | Motor On" )  # DEBUG
         time.sleep(2)
         motor.turnOff()
-        print( datetime.now() + " | Motor Off" ) # DEBUG
+        print( str(datetime.now()) + " | Motor Off" ) # DEBUG
         time.sleep(2)
 
 except KeyboardInterrupt:
