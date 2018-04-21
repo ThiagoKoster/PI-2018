@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 
-class Motor:
+class Motor():
 
     #Initializations
     def __init__(self, pinNumber = 21, pinMode = GPIO.BCM):

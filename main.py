@@ -1,16 +1,16 @@
 import RPi.GPIO as GPIO # Raspberry GPIO module
 import time
 from datetime import datetime
-import SDL_DS3231.SDL_DS3231 as RTC #RTC module
-from GPIO_CONTROL import Motor #Our module to control peripherals connected to the gpios (buttons, lcd, motor, buzzer) 
+import SDL_DS3231 #RTC module
+import GPIO_CONTROL #Our module to control peripherals connected to the gpios (buttons, lcd, motor, buzzer) 
 ################################# Function Definitions ###########################
 
 ####################################################
 
 #Main program
 try:
-    motor = Motor()
-    ds3231 = RTC()
+    motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE)
+    ds3231 = SDL_DS3231.SDL_DS3231() # start rtc object with default values
     ds3231.write_now()
     print 
     #Main loop
