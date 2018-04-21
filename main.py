@@ -1,36 +1,32 @@
-import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO # Raspberry GPIO module
 import time
 from datetime import datetime
+import SDL_DS3231.SDL_DS3231 as RTC #RTC module
+from GPIO_CONTROL import Motor #Our module to control peripherals connected to the gpios (buttons, lcd, motor, buzzer) 
 ################################# Function Definitions ###########################
 
-#Function to turn the motor on
-def motorOn():
-    print datetime.now()
-    GPIO.output(21,GPIO.HIGH)
-
-#Function to turn the motor off
-def motorOff():
-    GPIO.output(21,GPIO.LOW)
 ####################################################
-
 
 #Main program
 try:
-    #Initializations
-
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
-    GPIO.setup(21,GPIO.OUT)
-
+    motor = Motor()
+    ds3231 = RTC()
+    ds3231.write_now()
+    print 
     #Main loop
     while True:
-        motorOn()
+        print ("DS3231=\t\t%s") % ds3231.read_datetime()
+        motor.turnOn()
+        print( datetime.now() + " | Motor On" )  # DEBUG
         time.sleep(2)
-        motorOff()
+        motor.turnOff()
+        print( datetime.now() + " | Motor Off" ) # DEBUG
         time.sleep(2)
 
 except KeyboardInterrupt:
+    print("Program Stopped")
     GPIO.cleanup()
 
 except SystemExit:
+    print("System Exit")
     GPIO.cleanup()
