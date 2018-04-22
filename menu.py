@@ -50,5 +50,9 @@ askInput(option)
 print("Horarios salvos com sucesso")
 file = open("horarios.txt", "w")
 file.write(option +"\n")
-file.write(userTimes)
+########### bug ###########
+print(userTimes) # <-- something is happening that userTimes here is just receiving the last entered time
+for i in userTimes.split(' '):
+     file.write(i+'\n')
+#file.write(userTimes)
 file.close()
