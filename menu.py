@@ -1,5 +1,7 @@
 import sys
 import time
+
+
 def showMenu():
     print ("\n######################## MENU #######################")
     print("1 - Escolher horários definidos")
@@ -16,7 +18,7 @@ def isTimeFormat(input):
         return False
 
 def askInput(option):
-    global userTimes                    #global para pegar a variabvel userTimes global
+    userTimes = ""
     if(option == "1"):    
         print("Entre com os horários desejados, no padrao hh:mm hh:mm hh:mm ...")
         userTimes = input("Horarios: ")
@@ -32,27 +34,25 @@ def askInput(option):
         print("Opcao invalida, tente novamente")
         option = input("Entre com a opção desejada: ")
         askInput(option)
-
+    
     userTimesList = userTimes.split(" ")
-    for userTimes in userTimesList:
-        if(not isTimeFormat(userTimes)):
-            print("Horario " + userTimes + " invalido. Tente novamente usando o formato HH:MM para cada horario")
+    
+    for userTime in userTimesList:
+        if(not isTimeFormat(userTime)):
+            print("Horario " + userTime + " invalido. Tente novamente usando o formato HH:MM para cada horario")
             askInput(option)
-
             break
 
-userTimes = "" #Criar variavel global de entrada do usuário
+    
+    return userTimes
+
 showMenu()
 option = input("Entre com a opção desejada: ")
 print("Opção " + option + " selecionada")
-askInput(option)
-
+userTimes = askInput(option)
+print("Horarios recebidos: " + userTimes)
 print("Horarios salvos com sucesso")
 file = open("horarios.txt", "w")
 file.write(option +"\n")
-########### bug ###########
-#print(userTimes) # <-- something is happening that userTimes here is just receiving the last entered time
-#for i in userTimes.split(' '):
-#    file.write(i+'\n')
 file.write(userTimes)
 file.close()
