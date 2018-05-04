@@ -10,9 +10,10 @@ def getSelectedTimes():
     selectedTimes = [] #list of datetime objects
 
     if (fileLines[0] == '1'):  # option 1 -> various times on each line
-        timesString = fileLines[1].split(" ");         
-        # aux = (hour,minute) both are int values
-        print(timesString)
+        timesString = fileLines[1].split(" ")         
+        for i in range(len(timesString)):
+            selectedTimes.append(datetime.strptime(timesString[i],"%H:%M"))
+        print(selectedTimes)
         # fill array with (hour,minute) datetime.time objects
         #selectedTimes.append(time(aux[0], aux[1]))
     elif(fileLines[0] == '2'):  # option 2 -> base time followed by interval
