@@ -27,7 +27,7 @@ def getSelectedTimes():
         sys.exit()
     return option,selectedTimes # option, selectedTImes
 
-#converts a list of datetime.time to datetime.time objects
+#converts a list of datetime.datetime to datetime.time objects
 # list datetime.datetime objects -> list datetime.time objects
 def toTimeObject(selectedTimes):
     for i in range(len(selectedTimes)):
