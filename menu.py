@@ -46,13 +46,20 @@ def askInput(option):
     
     return userTimes
 
-showMenu()
-option = input("Entre com a opção desejada: ")
-print("Opção " + option + " selecionada")
-userTimes = askInput(option)
-print("Horarios recebidos: " + userTimes)
-print("Horarios salvos com sucesso")
-file = open("horarios.txt", "w")
-file.write(option +"\n")
-file.write(userTimes)
-file.close()
+try:
+    showMenu()
+    option = input("Entre com a opção desejada: ")
+    print("Opção " + option + " selecionada")
+    userTimes = askInput(option)
+    print("Horarios recebidos: " + userTimes)
+    print("Horarios salvos com sucesso")
+    file = open("horarios.txt", "w")
+    file.write(option +"\n")
+    file.write(userTimes)
+    file.close()
+    print("\n------------- Iniciando Main.py -------------")
+    import main
+
+
+except KeyboardInterrupt:
+    print("\nForce Close")

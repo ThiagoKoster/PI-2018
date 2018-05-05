@@ -1,7 +1,7 @@
-import RPi.GPIO as GPIO # Raspberry GPIO module
+import RPi.GPIO as GPIO # Raspberry GPIO module #DEBUG
 from datetime import datetime,time
 from time import sleep
-import GPIO_CONTROL #Our module to control peripherals connected to the gpios (buttons, lcd, motor, buzzer) 
+import GPIO_CONTROL #Our module to control peripherals connected to the gpios (buttons, lcd, motor, buzzer) #DEBUG
 ################################# Function Definitions ###########################
 
 #void -> int , array of datetime.time objects or a single datetime.time object 
@@ -22,7 +22,7 @@ def getSelectedTimes():
 
 #Main program
 try:
-    #motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE)
+    motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
     
     
     option,selectedTimes = getSelectedTimes()
@@ -38,11 +38,11 @@ try:
                         break             
                 elif timeNow == i : 
                     lastActiveTime = timeNow
-                    motor.turnOn()
-                    print( str(datetime.now()) + " | Motor On" )  # DEBUG
+                    motor.turnOn() #DEBUG
+                    print( str(datetime.now()) + " | Motor On" )  
                     sleep(2)
-                    motor.turnOff()
-                    print( str(datetime.now()) + " | Motor Off" ) # DEBUG
+                    motor.turnOff() #DEBUG
+                    print( str(datetime.now()) + " | Motor Off" ) 
                     sleep(2)
             sleep(20) #lower cpu ultilization inside the while loop <- improve this
 
@@ -56,9 +56,9 @@ try:
 
 except KeyboardInterrupt:
     print("\nProgram Stopped")
-    import menu 
-    GPIO.cleanup()
+    GPIO.cleanup() #DEBUG
+    import menu
 
 except SystemExit:
+    GPIO.cleanup() #DEBUG
     print("System Exit")
-    GPIO.cleanup()
