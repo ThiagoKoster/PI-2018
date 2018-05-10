@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO # Raspberry GPIO module #DEBUG
 from datetime import datetime,time,timedelta
 from time import sleep
 import sys
+import asyncio 
 import GPIO_CONTROL #Our module to control peripherals connected to the gpios (buttons, lcd, motor, buzzer) #DEBUG
 ################################# Function Definitions ###########################
 
@@ -46,13 +47,12 @@ def generateSchedule(startTime, interval):
     return schedule
     
 ####################################################
-
+rotations = 1
 #Main program
 try:
     motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
-    
     option,selectedTimes = getSelectedTimes()
-
+    loop = asyncio.get_event_loop()
     lastActiveTime = 0 # initialize lastActiveTime
     while True:
         ###### TODO  ######
@@ -62,20 +62,14 @@ try:
             if lastActiveTime == timeNow: #prevent from activating more than once on the same minute
                 break             
             elif timeNow == i : 
-                lastActiveTime = timeNow
-                motor.turnOn() #DEBUG
-                print( str(datetime.now()) + " | Motor On" )  
-                sleep(2)
-                motor.turnOff() #DEBUG
-                print( str(datetime.now()) + " | Motor Off" ) 
-                sleep(2)
+                loop.run_until_complete(motor.feedPet(rotations))
         sleep(20) #lower cpu ultilization inside the while loop <- improve this
-  
+    loop.close()
             
 except KeyboardInterrupt:
     print("\nProgram Stopped")
     GPIO.cleanup() #DEBUG
-    import menu_debug
+    import menu
 
 except SystemExit:
     GPIO.cleanup() #DEBUG
