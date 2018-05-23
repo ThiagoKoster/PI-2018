@@ -47,7 +47,7 @@ def generateSchedule(startTime, interval):
     return schedule
     
 ####################################################
-rotations = 1
+rotations = 0.5
 #Main program
 try:
     motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
@@ -58,13 +58,16 @@ try:
         ###### TODO  ######
         # Print Option Selected and Schedule? dont know if its really necessary
         timeNow = datetime.now().time().replace(second=0 , microsecond=0) # cut out seconds and microseconds
+        print(datetime.now().time())
         for i in selectedTimes:
             if lastActiveTime == timeNow: #prevent from activating more than once on the same minute
                 break             
             elif timeNow == i : 
+                lastActiveTime = timeNow
                 loop.run_until_complete(motor.feedPet(rotations))
+                #loop.close()
         sleep(20) #lower cpu ultilization inside the while loop <- improve this
-    loop.close()
+    #loop.close()
             
 except KeyboardInterrupt:
     print("\nProgram Stopped")
