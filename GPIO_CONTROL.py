@@ -32,6 +32,25 @@ class Motor():
         self.turnOff()
         print( str(datetime.now()) + " | Motor Off" )
 
+class PushButton():
+    #Initializations
+    def __init__(self,pinNumber, pinMode = GPIO.BCM):
+        self.pinNumber = pinNumber
+        self.pinMode = pinMode
+        GPIO.setmode(self.pinMode)
+        GPIO.setup(self.pinNumber, GPIO.IN, pull_up_down = GPIO.PUD_UP) #pull up resistor
+        GPIO.add_event_detect(self.pinNumber, GPIO.FALLING) # detects on falling edge
+                   
+    # read input and return true if button was pushed, simple debounce implemented              
+    def wasPushed(self):
+        if GPIO.event_detected(self.pinNumber):
+            sleep(0.005) # debounce for 5mSec
+            if GPIO.input(self.pinNumber) == 0:
+                return True
+            else:
+                return False
+
+
     
 class i2c_device:
    def __init__(self, addr, port=1):
