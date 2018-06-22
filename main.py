@@ -45,34 +45,60 @@ def generateSchedule(startTime, interval):
         schedule.append(startTime)
         startTime += delta
     return schedule
-    
+
 ####################################################
+#Objects
+lcd = GPIO_CONTROL.Lcd()
+confirmButton = GPIO_CONTROL.PushButton(26)
+#inits
+lcd.clear()
 rotations = 0.5
+
 #Main program
 try:
+    lcd.clear()
+    lcd.writeString("Carregando...")
+    sleep(2)
     motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
     option,selectedTimes = getSelectedTimes()
     loop = asyncio.get_event_loop()
     lastActiveTime = 0 # initialize lastActiveTime
+    oldClock = datetime.now().replace(year=1990,minute=0)
     while True:
         ###### TODO  ######
         # Print Option Selected and Schedule? dont know if its really necessary
+        #clock = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+        
+        clock = datetime.now().strftime('%H:%M')
+        newClock = datetime.now()
+        if (newClock.minute != oldClock.minute) or (newClock.year != oldClock.year):
+            lcd.clearLine(1)
+            lcd.writeString(clock,1,5)
+            oldClock = newClock
+            print( clock )
+        
         timeNow = datetime.now().time().replace(second=0 , microsecond=0) # cut out seconds and microseconds
-        print(datetime.now().time())
         for i in selectedTimes:
+            # TODO : mostrar prox hora de ativacao
             if lastActiveTime == timeNow: #prevent from activating more than once on the same minute
                 break             
             elif timeNow == i : 
                 lastActiveTime = timeNow
                 loop.run_until_complete(motor.feedPet(rotations))
-                #loop.close()
-        sleep(20) #lower cpu ultilization inside the while loop <- improve this
-    #loop.close()
-            
+        if confirmButton.wasPushed() : 
+            raise Exception('Call lcd_menu')
+        #sleep(20) #lower cpu ultilization inside the while loop <- improve this
+
+except Exception:
+    print ("Chamando lcd_menu\n")
+    GPIO.cleanup() #DEBUG
+    import lcd_menu
+    
+
 except KeyboardInterrupt:
     print("\nProgram Stopped")
     GPIO.cleanup() #DEBUG
-    import menu
+    import lcd_menu
 
 except SystemExit:
     GPIO.cleanup() #DEBUG
