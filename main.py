@@ -83,7 +83,7 @@ def getTime(textToPrint,inputTime):
             inputTime -= hourDelta
             lcd.clearLine(2)
             lcd.writeString( inputTime.strftime('%H:%M'),2,5)
-    while(not confirmButton.wasPushed()): #minute digit
+    while(not confirmButton.wasPushed()):  #minute digit
         lcd.writeString(" ",2,4)
         lcd.writeString("*",2,10)
         if upButton.wasPushed():

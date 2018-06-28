@@ -191,6 +191,4 @@ class Lcd:
       self.writeString("                  ",line)
 
    def clearChar(self,line,pos=0):
-      self.writeString(" ",line,pos);         
-         
-
+      self.writeString(" ",line,pos);
