@@ -34,17 +34,18 @@ class Motor():
 
 class PushButton():
     #Initializations
-    def __init__(self,pinNumber, pinMode = GPIO.BCM):
+    def __init__(self,pinNumber):
         self.pinNumber = pinNumber
-        self.pinMode = pinMode
-        GPIO.setmode(self.pinMode)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pinNumber, GPIO.IN, pull_up_down = GPIO.PUD_UP) #pull up resistor
+        
         GPIO.add_event_detect(self.pinNumber, GPIO.FALLING) # detects on falling edge
                    
     # read input and return true if button was pushed, simple debounce implemented              
     def wasPushed(self):
+        
         if GPIO.event_detected(self.pinNumber):
-            sleep(0.005) # debounce for 5mSec
+            sleep(0.025) # debounce for 25mSec
             if GPIO.input(self.pinNumber) == 0:
                 return True
             else:
@@ -181,9 +182,15 @@ class Lcd:
 
    # add custom characters (0 - 7)
    def loadCustomChars(self, fontdata):
-      self.write(0x40);
+      self.write(0x40)
       for char in fontdata:
          for line in char:
-            self.writeChar(line)         
+            self.writeChar(line)
+
+   def clearLine(self,line):
+      self.writeString("                  ",line)
+
+   def clearChar(self,line,pos=0):
+      self.writeString(" ",line,pos);         
          
 

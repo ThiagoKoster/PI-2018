@@ -45,35 +45,159 @@ def generateSchedule(startTime, interval):
         schedule.append(startTime)
         startTime += delta
     return schedule
+
+#############################################################
+###########################################################
+############# MENU
+def getMenuOptions():
+    lcd.clear()
+    lcd.writeString("> Opcao 1",1,0)
+    lcd.writeString("  Opcao 2",2,0)
+    option = 1
+    while not confirmButton.wasPushed():
+        if upButton.wasPushed():
+            option = 1
+            lcd.clearChar(2,0)
+            lcd.writeString(">",1,0)
+        elif downButton.wasPushed():
+            option = 2
+            lcd.clearChar(1,0)
+            lcd.writeString(">",2,0)
+    return option
+
+
+def getTime(textToPrint,inputTime):
     
-####################################################
+    hourDelta = timedelta(hours=1)
+    minuteDelta = timedelta(minutes = 1)
+    lcd.clear()
+    lcd.writeString(textToPrint)
+    lcd.writeString( inputTime.strftime('%H:%M'),2,5)
+    while(not confirmButton.wasPushed()): #hour digit
+        lcd.writeString("*",2,4)
+        if upButton.wasPushed():
+            inputTime += hourDelta
+            lcd.clearLine(2)
+            lcd.writeString( inputTime.strftime('%H:%M'),2,5)
+        elif downButton.wasPushed():
+            inputTime -= hourDelta
+            lcd.clearLine(2)
+            lcd.writeString( inputTime.strftime('%H:%M'),2,5)
+    while(not confirmButton.wasPushed()): #minute digit
+        lcd.writeString(" ",2,4)
+        lcd.writeString("*",2,10)
+        if upButton.wasPushed():
+            inputTime += minuteDelta
+            lcd.clearLine(2)
+            lcd.writeString( inputTime.strftime('%H:%M'),2,5)
+        elif downButton.wasPushed():
+            inputTime -= minuteDelta
+            lcd.clearLine(2)
+            lcd.writeString( inputTime.strftime('%H:%M'),2,5)
+    return inputTime.strftime('%H:%M')
+
+
+def getNumber(textToPrint):
+    timesNumber = 1
+    lcd.clear()
+    lcd.writeString(textToPrint)
+    
+    while(not confirmButton.wasPushed()):
+        if(downButton.wasPushed() and timesNumber > 1):
+            timesNumber -= 1
+            lcd.clearLine(2)
+        elif (upButton.wasPushed() and timesNumber < 3):
+            timesNumber += 1
+            lcd.clearLine(2)
+
+        lcd.writeString(str(timesNumber),2,7)
+    
+    return timesNumber
+        
+
+
+def schedule(option):
+    inputTime = datetime.now().replace(minute=00)
+    if option == 1:
+        userTimes = ""
+        timesNumber = getNumber("Num. de horarios")
+        for index in range(0,timesNumber):
+            if(index == timesNumber-1):
+                userTimes += getTime("Horario " + str(index + 1),inputTime)
+            else:
+                userTimes += getTime("Horario " + str(index + 1), inputTime) + " "
+
+
+
+    elif option == 2:
+        startTime = getTime("Horario Inicial",inputTime)
+        interval  = getTime("   Intervalo",inputTime.replace(hour=0))
+        userTimes = startTime + " " + interval
+
+    file = open("horarios.txt", "w")
+    file.write(str(option) +"\n")
+    file.write(userTimes)
+    file.close()
+
+#################################################### END OF MENU FUNCS
+
+# Interface objects
+upButton = GPIO_CONTROL.PushButton(20)
+downButton = GPIO_CONTROL.PushButton(16)
+confirmButton = GPIO_CONTROL.PushButton(26)
+lcd = GPIO_CONTROL.Lcd()
+
+#inits
+lcd.clear()
 rotations = 0.5
+
 #Main program
 try:
-    motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
-    option,selectedTimes = getSelectedTimes()
-    loop = asyncio.get_event_loop()
-    lastActiveTime = 0 # initialize lastActiveTime
     while True:
-        ###### TODO  ######
-        # Print Option Selected and Schedule? dont know if its really necessary
-        timeNow = datetime.now().time().replace(second=0 , microsecond=0) # cut out seconds and microseconds
-        print(datetime.now().time())
-        for i in selectedTimes:
-            if lastActiveTime == timeNow: #prevent from activating more than once on the same minute
-                break             
-            elif timeNow == i : 
-                lastActiveTime = timeNow
-                loop.run_until_complete(motor.feedPet(rotations))
-                #loop.close()
-        sleep(20) #lower cpu ultilization inside the while loop <- improve this
-    #loop.close()
+        #### menu #####
+        option = getMenuOptions()
+        schedule(option)
+        #### menu end #####
+
+        mainLoop = True
+        lcd.clear()
+        lcd.writeString("Iniciando...")
+        sleep(1)
+        motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
+        option,selectedTimes = getSelectedTimes()
+        loop = asyncio.get_event_loop()
+        lastActiveTime = 0 # initialize lastActiveTime
+        oldClock = datetime.now().replace(year=1990,minute=0)
+
+        while mainLoop:
+            ###### TODO  ######
+            # Print Option Selected and Schedule? dont know if its really necessary
+            #clock = str(datetime.now().hour) + ":" + str(datetime.now().minute)
             
+            clock = datetime.now().strftime('%H:%M')
+            newClock = datetime.now()
+            if (newClock.minute != oldClock.minute) or (newClock.year != oldClock.year):
+                lcd.clearLine(1)
+                lcd.writeString(clock,1,5)
+                oldClock = newClock
+                print( clock )
+            
+            timeNow = datetime.now().time().replace(second=0 , microsecond=0) # cut out seconds and microseconds
+            for i in selectedTimes:
+                # TODO : mostrar prox hora de ativacao
+                if lastActiveTime == timeNow: #prevent from activating more than once on the same minute
+                    break             
+                elif timeNow == i : 
+                    lastActiveTime = timeNow
+                    loop.run_until_complete(motor.feedPet(rotations))
+            if confirmButton.wasPushed() : 
+                mainLoop = False
+
+
 except KeyboardInterrupt:
-    print("\nProgram Stopped")
     GPIO.cleanup() #DEBUG
-    import menu
+    print("\nProgram Stopped\n")
 
 except SystemExit:
     GPIO.cleanup() #DEBUG
-    print("System Exit")
+    print("System Exit\n")
