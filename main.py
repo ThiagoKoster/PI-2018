@@ -149,23 +149,22 @@ lcd = GPIO_CONTROL.Lcd()
 
 #inits
 lcd.clear()
-rotations = 0.5
+rotations = 1.5
 
 #Main program
 try:
+    lcd.clear()
     while True:
         #### menu #####
         option = getMenuOptions()
         schedule(option)
         #### menu end #####
-
         mainLoop = True
         lcd.clear()
         lcd.writeString("Iniciando...")
         sleep(1)
         motor = GPIO_CONTROL.Motor() # start motor object with default values ( GPIO = 21 , BCM_MODE) #DEBUG
         option,selectedTimes = getSelectedTimes()
-        loop = asyncio.get_event_loop()
         lastActiveTime = 0 # initialize lastActiveTime
         oldClock = datetime.now().replace(year=1990,minute=0)
 
@@ -182,14 +181,29 @@ try:
                 oldClock = newClock
                 print( clock )
             
+            loop = asyncio.get_event_loop()
             timeNow = datetime.now().time().replace(second=0 , microsecond=0) # cut out seconds and microseconds
             for i in selectedTimes:
                 # TODO : mostrar prox hora de ativacao
                 if lastActiveTime == timeNow: #prevent from activating more than once on the same minute
                     break             
-                elif timeNow == i : 
+                elif timeNow == i :
                     lastActiveTime = timeNow
+                    
+                    clock = datetime.now().strftime('%H:%M')
+                    motorOnClock = "On   " + clock
+                    if ( selectedTimes.index(i)+1 ) >= len(selectedTimes) :
+                        nextActivationTime = "prox " + selectedTimes[0].strftime("%H:%M")
+                    else:
+                        nextActivationTime = "prox " + selectedTimes[selectedTimes.index(i)+1].strftime("%H:%M")
+                    #nextActivationTime = nextActivationTime[0:9]
+                    lcd.writeString(motorOnClock,1,0)
+                    lcd.writeString(nextActivationTime,2,0)
+                    
                     loop.run_until_complete(motor.feedPet(rotations))
+                    #loop.close()
+                    lcd.clearLine(1)
+                    lcd.writeString(clock,1,5)
             if confirmButton.wasPushed() : 
                 mainLoop = False
 
